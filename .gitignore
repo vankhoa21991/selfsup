@@ -1,0 +1,9 @@
+*.pth
+*.png
+!spec/*.pth
+models/
+mapping/
+#results/
+results/backbone/weights/*.pkl
+results/backbone/
+results/small/
