@@ -19,6 +19,13 @@ class Autoencoder(nn.Module):
             nn.ReLU(),
 			nn.ConvTranspose2d(64, 48, 4, stride=2, padding=1),  # [batch, 24, 8, 8]
             nn.ReLU(),
+
+
+
+
+
+
+
 			nn.ConvTranspose2d(48, 36, 4, stride=2, padding=1),  # [batch, 12, 16, 16]
             nn.ReLU(),
             nn.ConvTranspose2d(36, 24, 4, stride=2, padding=1),   # [batch, 3, 32, 32]

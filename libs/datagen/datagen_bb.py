@@ -5,6 +5,8 @@ import numpy as np
 import torch
 import torchvision
 import torch.utils.data as data
+from torch.utils.data import Dataset, DataLoader
+from torch import nn, optim
 import matplotlib.pyplot as plt
 
 tensorToImage = torchvision.transforms.ToPILImage()
@@ -139,3 +141,51 @@ class tiles_dataset_pt(data.Dataset):
 
     def __len__(self):
         return len(self.tile_paths)
+
+
+
+
+class CEImageDataset(Dataset):
+
+    def __init__(self, root, transform, output_size=192, input_size=128, outpaint=True):
+        self.transform = transform
+        self.output_size = output_size
+        self.input_size = input_size
+        self.outpaint = outpaint
+        self.files = sorted(glob.glob("%s/**/*.png" % root))
+
+    def apply_center_mask(self, img):
+        """Mask center part of image"""
+        # Get upper-left pixel coordinate
+        i = (self.output_size - self.input_size) // 2
+
+        if not (self.outpaint):
+            masked_part = img[:, i: i + self.input_size, i: i + self.input_size]
+            masked_img = img.clone()
+            masked_img[:, i: i + self.input_size, i: i + self.input_size] = 1
+
+        else:
+            masked_part = -1  # ignore this for outpainting
+            masked_img = img.clone()
+            masked_img[:, :i, :] = 1
+            masked_img[:, -i:, :] = 1
+            masked_img[:, :, :i] = 1
+            masked_img[:, :, -i:] = 1
+
+        return masked_img, masked_part
+
+    def __getitem__(self, index):
+
+        try:
+            img = PIL.Image.open(self.files[index % len(self.files)]).convert('RGB')
+            img = self.transform(img)
+        except:
+            # Likely corrupt image file, so generate black instead
+            img = torch.zeros((3, self.output_size, self.output_size))
+
+        masked_img, masked_part = self.apply_center_mask(img)
+
+        return img, masked_img, masked_part
+
+    def __len__(self):
+        return len(self.files)

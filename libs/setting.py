@@ -214,7 +214,7 @@ class TrainBBParam(SlideParam):
             self.TILE_DIR = self.TILE_DIR
             
 
-        self.model_type  = 'ae' # 'ae',  'unet', 'rot', inpainting outpainting
+        self.model_type  = 'unet' # 'ae',  'unet', 'rot', inpainting outpainting
 
 
         date = '2020-07-16-20-09-02'
@@ -234,20 +234,39 @@ class TrainBBParam(SlideParam):
         self.num_workers = 8
         self.niter = 3000
 
+
+class Train_inpainting(SlideParam):
+    def __init__(self):
+        super(Train_inpainting, self).__init__()
+        self.seed = 21
+
+        if self.mode == 'GCP':
+            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all'
+        else:
+            self.TILE_DIR = self.TILE_DIR
+        self.model_type = 'inpainting'
+        self.valid_every = 1
+        self.lr = 1e-4
+
+        self.train_batchsize = 8
+        self.val_batchsize = 8
+        self.num_workers = 8
+        self.niter = 3000
+
         # inpainting
-        self.netD_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netD_epoch_14_{}_5.78.pkl'.format(date,
-                                                                                                            self.model_type,
-                                                                                                            date,
-                                                                                                            self.model_type)
-        self.netG_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netG_epoch_14_{}_0.15.pkl'.format(date,
-                                                                                                            self.model_type,
-                                                                                                            date,
-                                                                                                            self.model_type)
-        
+        # self.netD_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netD_epoch_14_{}_5.78.pkl'.format(date,
+        #                                                                                                     self.model_type,
+        #                                                                                                     date,
+        #                                                                                                     self.model_type)
+        # self.netG_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netG_epoch_14_{}_0.15.pkl'.format(date,
+        #                                                                                                     self.model_type,
+        #                                                                                                     date,
+        #                                                                                                     self.model_type)
+        self.netD_path = None
+        self.netG_path = None
         self.ngpu = 1
 
         self.imageSize = 512
-
 
         self.ngf = 64
         self.ndf = 64
@@ -261,5 +280,38 @@ class TrainBBParam(SlideParam):
         self.wtl2 = 0.998
         self.wtlD = 0.001
         self.overlapL2Weight = 10
+
+
+class Train_outpainting(SlideParam):
+    def __init__(self):
+        super(Train_outpainting, self).__init__()
+        self.seed = 21
+
+        if self.mode == 'GCP':
+            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all'
+        else:
+            self.TILE_DIR = self.TILE_DIR
+
+        self.model_type = 'outpainting'  # 'ae',  'unet', 'rot', inpainting outpainting
+
+        date = '2020-07-16-20-09-02'
+
+        self.model_path = None
+
+        self.input_size = 128
+        self.output_size = 192
+        self.expand_size = (self.output_size - self.input_size) // 2
+        self.patch_w = self.output_size // 8
+        self.patch_h = self.output_size // 8
+        self.patch = (1, self.patch_h, self.patch_w)
+
+        # self.model_path = '/home/vankhoa/code/selfsvd/image-outpainting/outpaint_models/G_96.pt'
+        self.valid_every = 1
+        self.lr = 1e-4
+
+        self.train_batchsize = 8
+        self.val_batchsize = 8
+        self.num_workers = 8
+        self.niter = 3000
 
 
