@@ -84,12 +84,54 @@ class CEGenerator(nn.Module):
         for layer in self.model:
             x = layer(x)
             if count == 14:
-                encoded = x  # (4000,16,16)
+                encoded = x  # (4000,6,6)
             count = count + 1
 
         # print(encoded.size())
         return x, encoded.view(-1, 4000*6*6)
 
+class CEGeneratorResnet50(nn.Module):
+    def __init__(self, channels=3, extra_upsample=False):
+        super(CEGeneratorResnet50, self).__init__()
+
+        def downsample(in_feat, out_feat, normalize=True):
+            layers = [nn.Conv2d(in_feat, out_feat, 4, stride=2, padding=1)]
+            if normalize:
+                layers.append(nn.BatchNorm2d(out_feat, 0.8))
+            layers.append(nn.LeakyReLU(0.2))
+            return layers
+
+        def upsample(in_feat, out_feat, normalize=True):
+            layers = [nn.ConvTranspose2d(in_feat, out_feat, 4, stride=2, padding=1)]
+            if normalize:
+                layers.append(nn.BatchNorm2d(out_feat, 0.8))
+            layers.append(nn.ReLU())
+            return layers
+
+        self.resnet50 = models.resnet50(True)
+        self.encoder = nn.Sequential(*list(self.resnet50.children())[:-1])
+        self.decoder = nn.Sequential(
+                *upsample(2048, 1024),
+                *upsample(1024, 512),
+                *upsample(512, 256),
+                *upsample(256, 128),
+                *upsample(128, 64),
+                *upsample(64, 32),
+                *upsample(32, 16),
+                *upsample(16, 8),
+                *upsample(8, 4),
+                nn.Conv2d(4, channels, 3, 1, 1),
+                nn.Tanh()
+            )
+
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        output = self.decoder(encoded)
+
+        print(encoded.size())
+        print(output.size())
+        return output, encoded
 
 class CEDiscriminator(nn.Module):
     def __init__(self, channels=3):

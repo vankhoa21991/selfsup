@@ -28,7 +28,7 @@ import libs.utils.utils_bb as utils_bb
 import libs.utils.utils_outpainting as utils
 from libs.setting import Train_outpainting
 from libs.datagen.datagen_bb import CEImageDataset
-from libs.model.backbone.model_outpainting import CEGenerator, CEDiscriminator
+from libs.model.backbone.model_outpainting import CEGenerator, CEDiscriminator, CEGeneratorResnet50
 
 tp = Train_outpainting()
 
@@ -93,7 +93,8 @@ def load_split_train_test(valid_size = .2, test_size = .2):
 def train():
     train_loader, val_loader, test_loader = load_split_train_test()
 
-    G_net = CEGenerator(extra_upsample=True)
+    # G_net = CEGenerator(extra_upsample=True)
+    G_net = CEGeneratorResnet50()
     D_net = CEDiscriminator()
     G_net.apply(utils.weights_init_normal)
     D_net.apply(utils.weights_init_normal)

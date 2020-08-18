@@ -298,8 +298,8 @@ class Train_outpainting(SlideParam):
 
         self.model_path = None
 
-        self.input_size = 128
-        self.output_size = 192
+        self.input_size = 256
+        self.output_size = 512
         self.expand_size = (self.output_size - self.input_size) // 2
         self.patch_w = self.output_size // 8
         self.patch_h = self.output_size // 8
@@ -309,8 +309,8 @@ class Train_outpainting(SlideParam):
         self.valid_every = 1
         self.lr = 1e-4
 
-        self.train_batchsize = 8
-        self.val_batchsize = 8
+        self.train_batchsize = 4
+        self.val_batchsize = 4
         self.num_workers = 8
         self.niter = 3000
 
