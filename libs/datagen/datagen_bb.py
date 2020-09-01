@@ -189,3 +189,28 @@ class CEImageDataset(Dataset):
 
     def __len__(self):
         return len(self.files)
+
+class TileDatasetRR(Dataset):
+    def __init__(self, K, path, transform=None, mode='train'):
+        self.K = K  # tot number of augmentations
+
+        self.img_paths = glob.glob(path + '/**/*.png')
+        self.path = path
+        self.mode = mode
+
+        self.transform = transform
+
+    def __getitem__(self, index):
+        img_path = self.img_paths[index]
+        pic = PIL.Image.open(img_path)
+        img_list = list()
+        if self.mode == 'train':
+            for _ in range(self.K):
+                img_transformed = self.transform(pic.copy())
+                img_list.append(img_transformed)
+        else:
+            img_list = self.transform(PIL.Image.open(img_path))
+        return img_list, ''
+
+    def __len__(self):
+        return len(self.img_paths)

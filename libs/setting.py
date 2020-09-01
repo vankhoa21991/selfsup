@@ -207,7 +207,7 @@ class TrainBBParam(SlideParam):
     def __init__(self):
         super(TrainBBParam, self).__init__()
         self.seed = 21
-        
+
         if self.mode == 'GCP':
             self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all'
         else:
@@ -313,5 +313,20 @@ class Train_outpainting(SlideParam):
         self.val_batchsize = 4
         self.num_workers = 8
         self.niter = 3000
+
+class Train_RR(SlideParam):
+    def __init__(self):
+        super(Train_RR, self).__init__()
+
+        if self.mode == 'GCP':
+            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all'
+        else:
+            self.TILE_DIR = self.TILE_DIR
+        self.model_type = 'ReRe'
+        self.seed = 21
+        self.K = 4  # tot augmentations, in the paper K=32 for CIFAR10/100
+        self.batch_size = 4  # 64 has been used in the paper
+        self.tot_epochs = 2  # 200 has been used in the paper
+        self.feature_size = 512  # number of units for the Conv4 backbone
 
 

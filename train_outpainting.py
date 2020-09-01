@@ -54,44 +54,16 @@ with open(result_path + '/config.json', 'w') as f:
 # log with tensorboard
 writer = SummaryWriter(result_path)
 
-def load_split_train_test(valid_size = .2, test_size = .2):
-    # instantiate the dataset and dataloader
-    if tp.model_type == 'outpainting':
-        transform = transforms.Compose([
-            transforms.Resize(tp.output_size),
-            transforms.CenterCrop(tp.output_size),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor()])
-        data = CEImageDataset(tp.TILE_DIR, transform, tp.output_size, tp.input_size, outpaint=True)
-    else:
-        raise NotImplementedError
-
-    num_train = len(data)
-    indices = list(range(num_train))
-    split_val = int(np.floor(valid_size * num_train))
-    split_test = int(np.floor((valid_size + test_size) * num_train))
-    np.random.shuffle(indices)
-    from torch.utils.data.sampler import SubsetRandomSampler
-    train_idx, val_idx, test_idx = indices[split_test:], indices[:split_val], indices[split_val:split_test]
-    train_sampler = SubsetRandomSampler(train_idx)
-    val_sampler = SubsetRandomSampler(val_idx)
-    test_sampler = SubsetRandomSampler(test_idx)
-
-
-    train_loader = torch.utils.data.DataLoader(data,
-                   sampler=train_sampler, batch_size=tp.train_batchsize,num_workers=tp.num_workers)
-    val_loader = torch.utils.data.DataLoader(data,
-                                             sampler=val_sampler, batch_size=tp.val_batchsize,
-                                             num_workers=tp.num_workers)
-    test_loader = torch.utils.data.DataLoader(data,
-                   sampler=test_sampler, batch_size=tp.val_batchsize, num_workers=tp.num_workers)
-    print('Length trainloader: {}'.format(len(train_loader)))
-    print('Length valloader: {}'.format(len(val_loader)))
-    print('Length testloader: {}'.format(len(test_loader)))
-    return train_loader, val_loader, test_loader
-
 def train():
-    train_loader, val_loader, test_loader = load_split_train_test()
+    # instantiate the dataset and dataloader
+    transform = transforms.Compose([
+        transforms.Resize(tp.output_size),
+        transforms.CenterCrop(tp.output_size),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor()])
+    dataset = CEImageDataset(tp.TILE_DIR, transform, tp.output_size, tp.input_size, outpaint=True)
+
+    train_loader, val_loader, test_loader = utils_bb.load_split_train_test(dataset)
 
     # G_net = CEGenerator(extra_upsample=True)
     G_net = CEGeneratorResnet50()
