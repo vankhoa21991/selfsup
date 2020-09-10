@@ -49,14 +49,14 @@ class TileParam():
 class SlideParam(TileParam):
     def __init__(self, verbose=False):
         super(SlideParam, self).__init__()
-        self.mode = 'HOMEPC'
+        self.mode = 'GCP'
 
         if self.mode == 'GCP':
             self.dataset = 'PH'
             self.exp = 'L_BL' #   'T_colloid_2186' 'T_hyper_2186' 'L_necrosis_2186' 'L_necrosis_TG' 'L_necrosis_TG-2186' 'L_BL'
             
             if self.dataset == 'CS':
-                self.CODE_DIR      = "/home/eljzn_bayer_com/code/MILPath/"
+                self.CODE_DIR      = "/home/eljzn_bayer_com/code/selfsup/"
                 self.BASE_DIR      = "/home/eljzn_bayer_com/datasets/PD/"
                 self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "upload-preprocessed/CS")    # directory of svs/tif
                 self.TEMP_DIR      = os.path.join('/home/eljzn_bayer_com/datasets', "temp_pd") #os.path.join(self.BASE_DIR, "temp")
@@ -65,7 +65,7 @@ class SlideParam(TileParam):
                 self.SRC_TRAIN_EXT = "tif"
                 
             elif self.dataset == 'PH':
-                self.CODE_DIR      = "/home/eljzn_bayer_com/code/MILPath/"
+                self.CODE_DIR      = "/home/eljzn_bayer_com/code/selfsup/"
                 self.BASE_DIR      = "/home/eljzn_bayer_com/datasets/PD/"
                 self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "upload-preprocessed/PH")    # directory of svs/tif
                 self.TEMP_DIR      = os.path.join('/home/eljzn_bayer_com/datasets', "temp_pd") #os.path.join(self.BASE_DIR, "temp")
@@ -74,7 +74,7 @@ class SlideParam(TileParam):
                 self.SRC_TRAIN_EXT = "tif"
                 
             elif self.dataset == 'TG':
-                self.CODE_DIR      = "/home/eljzn_bayer_com/code/MILPath/"
+                self.CODE_DIR      = "/home/eljzn_bayer_com/code/selfsup/"
                 self.BASE_DIR      = "/home/eljzn_bayer_com/datasets/TG/"
                 self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "data/open-tg-gates/images/")    # directory of svs/tif
                 self.TEMP_DIR      = os.path.join('/home/eljzn_bayer_com/datasets', "temp_tg")
@@ -85,7 +85,7 @@ class SlideParam(TileParam):
         elif self.mode == 'HOMEPC':
             self.dataset = 'PD'
             self.exp = 'small'  # 'T_colloid_2186' 'T_hyper_2186' 'L_necrosis_2186' 'L_necrosis_TG'
-            self.CODE_DIR = "/home/vankhoa/code/Bayer/MILPath/"
+            self.CODE_DIR = "/home/vankhoa/code/Bayer/selfsup/"
             self.BASE_DIR = "/home/vankhoa/datasets/ImgPath/PD/CS_small"          # main directory of images
             self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "")                  # directory of svs/tif
             self.TEMP_DIR = "/home/vankhoa/datasets/ImgPath/temp_small/"
@@ -95,7 +95,7 @@ class SlideParam(TileParam):
         elif self.mode == 'MARCO_DGX':
             self.dataset = 'PD'
             self.exp = 'small'  # 'T_colloid_2186' 'T_hyper_2186' 'L_necrosis_2186' 'L_necrosis_TG'
-            self.CODE_DIR = "/home/glsvu/MILPath/"
+            self.CODE_DIR = "/home/glsvu/selfsup/"
             self.BASE_DIR = "/home/glsvu/datasets/ImgPath/PD/CS_small"          # main directory of images
             self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "")                # directory of svs/tif
             self.TEMP_DIR = "/home/glsvu/datasets/ImgPath/temp_small/"
@@ -103,7 +103,7 @@ class SlideParam(TileParam):
             self.SRC_TRAIN_EXT = "svs"
 
         elif self.mode == 'LAPTOP':
-            self.CODE_DIR      = "C:\\Bayer/2_code/MILPath/"
+            self.CODE_DIR      = "C:\\Bayer/2_code/selfsup/"
             self.BASE_DIR      = "C:\\Bayer/1_data/realData/uploadData"  # main directory of images
             self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "")  # directory of svs/tif
             self.TEMP_DIR      = "C:\\Bayer/1_data/realData/temp/"
@@ -241,7 +241,7 @@ class Train_inpainting(SlideParam):
         self.seed = 21
 
         if self.mode == 'GCP':
-            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all'
+            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all/Liver/'
         else:
             self.TILE_DIR = self.TILE_DIR
         self.model_type = 'inpainting'
@@ -319,14 +319,14 @@ class Train_RR(SlideParam):
         super(Train_RR, self).__init__()
 
         if self.mode == 'GCP':
-            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all'
+            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all/Liver'
         else:
             self.TILE_DIR = self.TILE_DIR
         self.model_type = 'ReRe'
         self.seed = 21
         self.K = 4  # tot augmentations, in the paper K=32 for CIFAR10/100
         self.batch_size = 4  # 64 has been used in the paper
-        self.tot_epochs = 2  # 200 has been used in the paper
-        self.feature_size = 512  # number of units for the Conv4 backbone
+        self.tot_epochs = 200  # 200 has been used in the paper
+        self.feature_size = 2048  # number of units for the Conv4 backbone
 
 

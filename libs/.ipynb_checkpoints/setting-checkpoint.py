@@ -56,7 +56,7 @@ class SlideParam(TileParam):
             self.exp = 'L_BL' #   'T_colloid_2186' 'T_hyper_2186' 'L_necrosis_2186' 'L_necrosis_TG' 'L_necrosis_TG-2186' 'L_BL'
             
             if self.dataset == 'CS':
-                self.CODE_DIR      = "/home/eljzn_bayer_com/code/MILPath/"
+                self.CODE_DIR      = "/home/eljzn_bayer_com/code/selfsup/"
                 self.BASE_DIR      = "/home/eljzn_bayer_com/datasets/PD/"
                 self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "upload-preprocessed/CS")    # directory of svs/tif
                 self.TEMP_DIR      = os.path.join('/home/eljzn_bayer_com/datasets', "temp_pd") #os.path.join(self.BASE_DIR, "temp")
@@ -65,7 +65,7 @@ class SlideParam(TileParam):
                 self.SRC_TRAIN_EXT = "tif"
                 
             elif self.dataset == 'PH':
-                self.CODE_DIR      = "/home/eljzn_bayer_com/code/MILPath/"
+                self.CODE_DIR      = "/home/eljzn_bayer_com/code/selfsup/"
                 self.BASE_DIR      = "/home/eljzn_bayer_com/datasets/PD/"
                 self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "upload-preprocessed/PH")    # directory of svs/tif
                 self.TEMP_DIR      = os.path.join('/home/eljzn_bayer_com/datasets', "temp_pd") #os.path.join(self.BASE_DIR, "temp")
@@ -74,7 +74,7 @@ class SlideParam(TileParam):
                 self.SRC_TRAIN_EXT = "tif"
                 
             elif self.dataset == 'TG':
-                self.CODE_DIR      = "/home/eljzn_bayer_com/code/MILPath/"
+                self.CODE_DIR      = "/home/eljzn_bayer_com/code/selfsup/"
                 self.BASE_DIR      = "/home/eljzn_bayer_com/datasets/TG/"
                 self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "data/open-tg-gates/images/")    # directory of svs/tif
                 self.TEMP_DIR      = os.path.join('/home/eljzn_bayer_com/datasets', "temp_tg")
@@ -85,7 +85,7 @@ class SlideParam(TileParam):
         elif self.mode == 'HOMEPC':
             self.dataset = 'PD'
             self.exp = 'small'  # 'T_colloid_2186' 'T_hyper_2186' 'L_necrosis_2186' 'L_necrosis_TG'
-            self.CODE_DIR = "/home/vankhoa/code/Bayer/MILPath/"
+            self.CODE_DIR = "/home/vankhoa/code/Bayer/selfsup/"
             self.BASE_DIR = "/home/vankhoa/datasets/ImgPath/PD/CS_small"          # main directory of images
             self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "")                  # directory of svs/tif
             self.TEMP_DIR = "/home/vankhoa/datasets/ImgPath/temp_small/"
@@ -95,7 +95,7 @@ class SlideParam(TileParam):
         elif self.mode == 'MARCO_DGX':
             self.dataset = 'PD'
             self.exp = 'small'  # 'T_colloid_2186' 'T_hyper_2186' 'L_necrosis_2186' 'L_necrosis_TG'
-            self.CODE_DIR = "/home/glsvu/MILPath/"
+            self.CODE_DIR = "/home/glsvu/selfsup/"
             self.BASE_DIR = "/home/glsvu/datasets/ImgPath/PD/CS_small"          # main directory of images
             self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "")                # directory of svs/tif
             self.TEMP_DIR = "/home/glsvu/datasets/ImgPath/temp_small/"
@@ -103,7 +103,7 @@ class SlideParam(TileParam):
             self.SRC_TRAIN_EXT = "svs"
 
         elif self.mode == 'LAPTOP':
-            self.CODE_DIR      = "C:\\Bayer/2_code/MILPath/"
+            self.CODE_DIR      = "C:\\Bayer/2_code/selfsup/"
             self.BASE_DIR      = "C:\\Bayer/1_data/realData/uploadData"  # main directory of images
             self.SRC_TRAIN_DIR = os.path.join(self.BASE_DIR, "")  # directory of svs/tif
             self.TEMP_DIR      = "C:\\Bayer/1_data/realData/temp/"
@@ -203,170 +203,70 @@ class SlideParam(TileParam):
 
         input('Verify the paths and press any key..')
 
-class TrainParam(SlideParam):
-    def __init__(self):
-        super(TrainParam, self).__init__()
-        self.train_lib = self.train_lib
-
-        self.mil_batch_size    = 128
-        self.mil_nepochs       = 1000
-
-        self.mil_workers       = 0
-        self.mil_test_every    = 2
-        self.mil_weights       = self.get_weights_ratio()
-
-        self.mil_k             = 20
-        self.mil_lr            = 1e-4
-        self.mil_wdecays       = 1e-4
-        self.thres_prediction  = 0.98
-        self.inference_size    = 200
-
-        self.rnn_lr            = 10e-4
-        self.rnn_batch_size    = 2
-        self.rnn_nepochs       = 1000
-        self.rnn_workers       = 4
-        self.rnn_s             = 9
-        self.rnn_ndims         = 128
-        self.rnn_weights       = 0.7
-        self.rnn_shuffle       = True
-        
-    def get_weights_ratio(self):
-        lib_train = torch.load(self.train_lib)
-        ratio = lib_train['targets'].value_counts()[0]/(len(lib_train['targets']))
-        return ratio
-        
-class FeatureExtractionParam(SlideParam):
-    def __init__(self):
-        super(FeatureExtractionParam, self).__init__()
-        self.model_type = 'ResNet34'  # ResNet34, AE
-        if self.mode == 'GCP':
-            self.feature_dir =  '/home/eljzn_bayer_com/datasets/features_dir_{}_{}'.format(self.TILE_SIZE, self.model_type)
-        else:
-            self.feature_dir = self.BASE_DIR + '/features_dir_{}_{}'.format(self.TILE_SIZE, self.model_type)
-        self.label_pkl = self.file_label_proc_w_grid
-        self.feature_dim = 1024
-        self.batch_size = 128
-
-class SplitParam(FeatureExtractionParam):
-    def __init__(self):
-        super(SplitParam, self).__init__()
-        if self.mode == 'GCP':
-            self.split_dir = '/home/eljzn_bayer_com/datasets/split_dir' + '/{}_{}'.format(self.exp, self.TILE_SIZE)  #
-        else:
-            self.split_dir = self.BASE_DIR + '/split_dir_{}_{}'.format(self.TILE_SIZE, self.model_type)
-        self.seed = 21
-        self.file_label_proc = self.file_label_proc
-        self.label_fracs = 1
-        self.label_dict = {0.0: 0, 1.0: 1}
-        self.k = 5
-
-class TrainAttParam(SplitParam):
-    def __init__(self):
-        super(TrainAttParam, self).__init__()
-        # PATH
-        self.data_root_dir = self.feature_dir           # get from feature extraction class
-        self.results_dir   = self.mil_output_logs       # default result dir
-        self.split_dir     = self.split_dir             # defined in splitparam class
-
-        # TRAINING
-        self.n_classes     = 2
-        self.label_dict    = self.label_dict            # defined in splitparam class
-        self.encoding_size = 1000                       # resnet 34
-
-        self.max_epochs    = 40
-        self.lr            = 1e-5
-
-        self.label_frac    = 1
-        self.bag_weight    = 0.8                        # ratio bag loss vs instance loss
-        self.reg           = 1e-5
-        self.seed          = self.seed                  # defined in splitparam class
-        self.k             = self.k                     # k-fold cross validation, adapt from split
-        self.k_start       = -1
-        self.k_end         = -1
-        self.early_stopping = False
-        self.opt            = 'adam'  #sgd
-        self.drop_out       = True
-        self.inst_loss      = None # svm, ce None
-        self.bag_loss       = 'ce'  # svm
-        self.model_type     = 'clam'  # mil clam
-
-        self.weighted_sample = True
-        self.model_size      = 'small'                       # clam:small big  mil: A B
-
-        # LOGGING
-        self.log_data  = True
-        self.testing   = False
-        self.subtyping = False
-
-class TestAttParam(TrainAttParam):
-    def __init__(self):
-        super(TestAttParam, self).__init__()
-        # PATH
-        self.data_root_dir = self.feature_dir                                # get from feature extraction class
-        self.results_dir   = self.mil_output_logs                            # default result dir
-        self.split_dir     = self.split_dir                                  # defined in splitparam class
-<<<<<<< Updated upstream
-        self.models_dir    = self.results_dir + '/{}/2020-06-22-11-02-04_train_clam_{}_{}'.format(self.exp, self.exp, self.TILE_SIZE)
-=======
-        self.models_dir    = self.results_dir + '/L_necrosis_TG-2186/2020-06-17-13-27-45_train_clam_L_necrosis_TG-2186_512'.format(self.exp, self.exp, self.TILE_SIZE)
->>>>>>> Stashed changes
-
-        self.exp_code        = ''
-        self.model_size      = self.model_size                               # get from TrainAttParam
-        self.model_type      = self.model_type
-        self.drop_out        = self.drop_out
-        self.k               = self.k                                        # k-fold cross validation
-        self.k_start         = self.k_start
-        self.k_end           = self.k_end
-        self.fold            = 0                                           # select fold to evaluate, if -1 run all fold
-        self.micro_average   = False
-        self.split           = 'test'                                        # 'train', 'val', 'test', 'all'
-        self.encoding_size = self.encoding_size
-
 class TrainBBParam(SlideParam):
     def __init__(self):
         super(TrainBBParam, self).__init__()
         self.seed = 21
-        
+
         if self.mode == 'GCP':
             self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all'
         else:
             self.TILE_DIR = self.TILE_DIR
             
 
-        self.model_type  = 'inpainting' # 'ae',  'unet', 'rot', inpainting
+        self.model_type  = 'unet' # 'ae',  'unet', 'rot', inpainting outpainting
 
 
         date = '2020-07-16-20-09-02'
         # self.model_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_epoch_29_backbone_{}.pkl'.format(date, self.model_type, date, self.model_type)
-        self.model_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netG_epoch_220_{}_0.08.pth'.format(date,
-                                                                                                            self.model_type,
-                                                                                                            date,
-                                                                                                            self.model_type)
+        # self.model_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netG_epoch_220_{}_0.08.pth'.format(date,
+        #                                                                                                     self.model_type,
+        #                                                                                                     date,
+        #                                                                                                     self.model_type)
         self.model_path = None
 
+        # self.model_path = '/home/vankhoa/code/selfsvd/image-outpainting/outpaint_models/G_96.pt'
         self.valid_every = 1
         self.lr = 1e-4
 
-        self.train_batchsize = 32
-        self.val_batchsize = 32
+        self.train_batchsize = 8
+        self.val_batchsize = 8
+        self.num_workers = 8
+        self.niter = 3000
+
+
+class Train_inpainting(SlideParam):
+    def __init__(self):
+        super(Train_inpainting, self).__init__()
+        self.seed = 21
+
+        if self.mode == 'GCP':
+            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all/Liver/'
+        else:
+            self.TILE_DIR = self.TILE_DIR
+        self.model_type = 'inpainting'
+        self.valid_every = 1
+        self.lr = 1e-4
+
+        self.train_batchsize = 8
+        self.val_batchsize = 8
         self.num_workers = 8
         self.niter = 3000
 
         # inpainting
-        self.netD_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netD_epoch_14_{}_5.78.pkl'.format(date,
-                                                                                                            self.model_type,
-                                                                                                            date,
-                                                                                                            self.model_type)
-        self.netG_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netG_epoch_14_{}_0.15.pkl'.format(date,
-                                                                                                            self.model_type,
-                                                                                                            date,
-                                                                                                            self.model_type)
-        
+        # self.netD_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netD_epoch_14_{}_5.78.pkl'.format(date,
+        #                                                                                                     self.model_type,
+        #                                                                                                     date,
+        #                                                                                                     self.model_type)
+        # self.netG_path = self.mil_output_logs + '/backbone/{}_train_{}/{}_netG_epoch_14_{}_0.15.pkl'.format(date,
+        #                                                                                                     self.model_type,
+        #                                                                                                     date,
+        #                                                                                                     self.model_type)
+        self.netD_path = None
+        self.netG_path = None
         self.ngpu = 1
 
         self.imageSize = 512
-
 
         self.ngf = 64
         self.ndf = 64
@@ -380,5 +280,53 @@ class TrainBBParam(SlideParam):
         self.wtl2 = 0.998
         self.wtlD = 0.001
         self.overlapL2Weight = 10
+
+
+class Train_outpainting(SlideParam):
+    def __init__(self):
+        super(Train_outpainting, self).__init__()
+        self.seed = 21
+
+        if self.mode == 'GCP':
+            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all'
+        else:
+            self.TILE_DIR = self.TILE_DIR
+
+        self.model_type = 'outpainting'  # 'ae',  'unet', 'rot', inpainting outpainting
+
+        date = '2020-07-16-20-09-02'
+
+        self.model_path = None
+
+        self.input_size = 256
+        self.output_size = 512
+        self.expand_size = (self.output_size - self.input_size) // 2
+        self.patch_w = self.output_size // 8
+        self.patch_h = self.output_size // 8
+        self.patch = (1, self.patch_h, self.patch_w)
+
+        # self.model_path = '/home/vankhoa/code/selfsvd/image-outpainting/outpaint_models/G_96.pt'
+        self.valid_every = 1
+        self.lr = 1e-4
+
+        self.train_batchsize = 4
+        self.val_batchsize = 4
+        self.num_workers = 8
+        self.niter = 3000
+
+class Train_RR(SlideParam):
+    def __init__(self):
+        super(Train_RR, self).__init__()
+
+        if self.mode == 'GCP':
+            self.TILE_DIR = '/home/eljzn_bayer_com/datasets/tiles_all/Liver'
+        else:
+            self.TILE_DIR = self.TILE_DIR
+        self.model_type = 'ReRe'
+        self.seed = 21
+        self.K = 4  # tot augmentations, in the paper K=32 for CIFAR10/100
+        self.batch_size = 4  # 64 has been used in the paper
+        self.tot_epochs = 200  # 200 has been used in the paper
+        self.feature_size = 2048  # number of units for the Conv4 backbone
 
 
